@@ -223,11 +223,10 @@ async def SuperUsuario(ctx):
     
 @bot.command()
 async def UpdateHash(ctx, nova_senha: str):
-    # Atualizar a coluna password na linha de id 1
     canal_especifico = 'adm'
     canal_especifico_obj = discord.utils.get(ctx.guild.text_channels, name=canal_especifico)
     if ctx.channel.name != canal_especifico:
-        await ctx.send(f'Comandos só devem ser utilizados no canal {canal_especifico_obj.mention}.',delete_after=5)
+        await ctx.send(f'Este comando só deve ser utilizado no canal: {canal_especifico_obj.mention}.',delete_after=5)
         await ctx.message.delete()
         return
     else:  
@@ -272,9 +271,10 @@ async def CvToque(ctx):
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Manual(ctx):
-    response = 'https://app.clickup.com/9011563714/v/dc/8cj3362-1771/8cj3362-1791'
-    await ctx.send(f'Link: <{response}>')
-
+    response = supabase.table("Manual").select("Link").execute()
+    reponse_formatada = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n" for item in response.data])
+    await ctx.send(reponse_formatada)
+    
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Plantao(ctx):
