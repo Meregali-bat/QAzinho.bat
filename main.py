@@ -1,14 +1,15 @@
 # Import the required modules
 import discord
 import os
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import aiohttp
 import io
 from supabase import create_client, Client
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from functools import wraps
+import asyncio
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # Set the confirmation message when the bot is ready
 @bot.event
 async def on_ready():
+    clear_channel.start()
     print(f'Logged in as {bot.user.name}')
 
 #Funcões
@@ -42,7 +44,28 @@ def canal_especifico(nome_canal):
         return wrapper
     return decorator
 
+async def delete_bot_and_command_messages(channel):
+    now = datetime.now(timezone.utc)
+    async for message in channel.history(limit=100):
+        if message.author == bot.user or message.content.startswith('!'):
+            message_age = now - message.created_at
+            if message_age > timedelta(minutes=1):
+                try:
+                    await message.delete()
+                    await asyncio.sleep(1)
+                except discord.errors.HTTPException as e:
+                    if e.status == 429:
+                        retry_after = e.retry_after
+                        print(f"Rate limited. Retrying in {retry_after} seconds.")
+                        await asyncio.sleep(retry_after)
+
 # Comandos automáticos
+@tasks.loop(seconds=20)
+async def clear_channel():
+    channel = discord.utils.get(bot.get_all_channels(), name='qazinho-comandos') 
+    if channel:
+        await delete_bot_and_command_messages(channel)
+
 @bot.event
 async def on_member_join(member):
     channel = discord.utils.get(member.guild.text_channels, name='hora_do_café')
