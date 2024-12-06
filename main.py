@@ -145,48 +145,20 @@ async def Anydesk(ctx):
     usuario_formatado = "\n\n".join([f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
     await ctx.send(usuario_formatado)
     
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Incidente(ctx):
-    response = ' ```[ ] Incidente P1 (URGENTE)\n\
-[ ] Incidente P2 (Resolver entre 1 dia)\n\
-[ ] Incidente P3 (Resolver em 1 semana)\n\
-    Informações adicionais: \n\
-      Cliente aguardando?\n\
-      [ ] Sim\n\
-      [ ] Não\n\
-\n\
-      Formas de contornar?\n\
-      [ ] Sim\n\
-      [ ] Não\n\
-\n\
--> Descrição completa do ocorrido:\n\
-\n\
--> Módulo:\n\
-\n\
--> Informações adicionais que poderão ajudar:\n\
-\n\
--> Detalhes como o problema é recente, quando começou (data), alguma configuração foi alterada no sistema por parte do cliente;\n\
-\n\
--> Só acontece em uma máquina específica? Foi mexido em algo na máquina?\n\
-\n\
--> Aparece algo no console? **Adicionar imagem**\n\
-    \n\
-***Evidências na forma de imagens, vídeos, arquivos;***\n\
-**Testar na conta do suporte, replicando conforme cliente passou** ```'
-    await ctx.send(response)
-    
+    response = supabase.table("IncidenteAPI").select("LayoutIncApi").execute()
+    IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApi']}```" for item in response.data])
+    await ctx.send(IncidenteFormatado)
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def IncidenteApp(ctx):
-    response = ' ```Versão do Android ou iOS;\n\
-Versão do aplicativo - essa informação pode ser visualizada na PlayStore ou AppStore;\n\
-Modelo do celular (ex. Samsung A10);\n\
-Usuário que aconteceu o erro se for o caso (usuário e senha);\n\
-Evidências na forma de imagens e/ou vídeos;\n\
-Descrição do que fez e como ocasionou o erro.\n\
-```'    
-    await ctx.send(response)
+    response = supabase.table("IncidenteAPP").select("LayoutIncApp").execute()
+    IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApp']}```" for item in response.data])
+    await ctx.send(IncidenteFormatado)
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
