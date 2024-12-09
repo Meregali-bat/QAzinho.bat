@@ -157,6 +157,7 @@ async def on_message(message):
 !IncidenteApp\n\
 !Logs\n\
 !Manual\n\
+!Senha \n\
 !SuperUsuario\n\
 !TemaBottero\n\
 !TemaMercado```'
@@ -315,6 +316,37 @@ async def Plantao(ctx):
 async def Senha(ctx):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
     await ctx.send(random_string)
+    
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def CPF(ctx):
+    def generate_cpf():
+        # Gerar os primeiros 9 dígitos aleatórios
+        cpf = [random.randint(0, 9) for _ in range(9)]
+
+        # Calcular o primeiro dígito verificador
+        sum1 = sum((cpf[i] * (10 - i) for i in range(9)))
+        digit1 = 11 - (sum1 % 11)
+        if digit1 >= 10:
+            digit1 = 0
+        cpf.append(digit1)
+
+        # Calcular o segundo dígito verificador
+        sum2 = sum((cpf[i] * (11 - i) for i in range(10)))
+        digit2 = 11 - (sum2 % 11)
+        if digit2 >= 10:
+            digit2 = 0
+        cpf.append(digit2)
+
+        return ''.join(map(str, cpf))
+
+    # Gerar um CPF válido
+    random_cpf = generate_cpf()
+    
+    # Formatar o CPF
+    formatted_cpf = f"{random_cpf[:3]}.{random_cpf[3:6]}.{random_cpf[6:9]}-{random_cpf[9:]}"
+    
+    await ctx.send(formatted_cpf)
 
 if current_branch == 'main':
     TOKEN = bot.run(os.getenv('TOKEN'))
