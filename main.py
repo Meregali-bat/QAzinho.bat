@@ -12,6 +12,7 @@ from functools import wraps
 import asyncio
 import random
 import string
+import git
 
 load_dotenv()
 
@@ -20,7 +21,9 @@ supabase_url: str = os.getenv('SUPABASE_URL')
 supabase_key: str = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(supabase_url, supabase_key)
 
-current_branch = os.getenv('GIT_BRANCH')
+repo = git.Repo(search_parent_directories=True)
+current_branch = repo.active_branch.name
+
 
 # Create a Discord client instance and set the command prefix
 intents = discord.Intents.all()
