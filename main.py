@@ -10,6 +10,8 @@ from supabase import create_client, Client
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 import asyncio
+import random
+import string
 
 load_dotenv()
 
@@ -17,6 +19,8 @@ load_dotenv()
 supabase_url: str = os.getenv('SUPABASE_URL')
 supabase_key: str = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(supabase_url, supabase_key)
+
+current_branch = os.getenv('GIT_BRANCH')
 
 # Create a Discord client instance and set the command prefix
 intents = discord.Intents.all()
@@ -46,7 +50,7 @@ def canal_especifico(nome_canal):
 
 async def delete_bot_and_command_messages(channel):
     now = datetime.now(timezone.utc)
-    async for message in channel.history(limit=100):
+    async for message in channel.history(limit=300):
             message_age = now - message.created_at
             if message_age > timedelta(minutes=1):
                 try:
@@ -144,7 +148,6 @@ async def on_message(message):
     if bot.user.mentioned_in(message):
         response = '```Os comandos disponíveis são:\n\
 !AnydeskSuporte\n\
-!Comandos\n\
 !CvBottero\n\
 !CvToque\n\
 !Incidente\n\
@@ -306,8 +309,11 @@ async def Plantao(ctx):
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
-async def TESTE(ctx):
-    response = "````ISSO É APENAS UM TESTE```"
-    await ctx.send(response)
-    
-bot.run(os.getenv('TOKEN'))
+async def Senha(ctx):
+    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    await ctx.send(random_string)
+
+if current_branch == 'main':
+    TOKEN = bot.run(os.getenv('TOKEN'))
+else:
+    TOKEN = bot.run(os.getenv('TOKEN_TESTE'))
