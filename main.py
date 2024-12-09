@@ -47,7 +47,6 @@ def canal_especifico(nome_canal):
 async def delete_bot_and_command_messages(channel):
     now = datetime.now(timezone.utc)
     async for message in channel.history(limit=100):
-        if message.author == bot.user or message.content.startswith('!'):
             message_age = now - message.created_at
             if message_age > timedelta(minutes=1):
                 try:
@@ -304,5 +303,11 @@ async def Plantao(ctx):
         formatted_response = "Nenhum dado encontrado."
 
     await ctx.send(formatted_response)
+    
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def TESTE(ctx):
+    response = "````ISSO É APENAS UM TESTE```"
+    await ctx.send(response)
     
 bot.run(os.getenv('TOKEN'))
