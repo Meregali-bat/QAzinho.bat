@@ -53,9 +53,9 @@ def canal_especifico(nome_canal):
 
 async def delete_bot_and_command_messages(channel):
     now = datetime.now(timezone.utc)
-    async for message in channel.history(limit=300):
+    async for message in channel.history(limit=100):
             message_age = now - message.created_at
-            if message_age > timedelta(minutes=1):
+            if message_age > timedelta(minutes=5):
                 try:
                     await message.delete()
                     await asyncio.sleep(1)
@@ -150,14 +150,16 @@ Utilize !Comandos no canal {canal_especifico_obj.mention} para ver os comandos v
 async def on_message(message):
     if bot.user.mentioned_in(message):
         response = '```Os comandos disponíveis são:\n\
-!AnydeskSuporte\n\
+!Anydesk\n\
+!CPF\n\
 !CvBottero\n\
 !CvToque\n\
 !Incidente\n\
 !IncidenteApp\n\
 !Logs\n\
 !Manual\n\
-!Senha \n\
+!Platao\n\
+!Senha\n\
 !SuperUsuario\n\
 !TemaBottero\n\
 !TemaMercado```'
