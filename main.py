@@ -350,7 +350,7 @@ async def CPF(ctx):
     
     await ctx.send(formatted_cpf)
 
-if current_branch == 'main':
+if current_branch == 'Master':
     TOKEN = bot.run(os.getenv('TOKEN'))
 else:
     TOKEN = bot.run(os.getenv('TOKEN_TESTE'))
