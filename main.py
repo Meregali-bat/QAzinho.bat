@@ -66,6 +66,27 @@ async def delete_bot_and_command_messages(channel):
                         retry_after = e.retry_after
                         print(f"Rate limited. Retrying in {retry_after} seconds.")
                         await asyncio.sleep(retry_after)
+                        
+async def get_scripts_type(Type1):
+    response = supabase.table('Scripts').select("Type2, Scripts").eq("Type1", Type1).execute()
+    if response.data:
+        # Agrupar scripts por type2
+        scripts_by_type2 = {}
+        for item in response.data:
+            type2 = item['Type2']
+            script = item['Scripts']
+            if type2 not in scripts_by_type2:
+                scripts_by_type2[type2] = []
+            scripts_by_type2[type2].append(script)
+        
+        # Formatar a resposta
+        formatted_response = "\n".join([
+            f"**{type2}**:" + "\n".join([f"```sql\n{script}```" for script in scripts])
+            for type2, scripts in scripts_by_type2.items()
+        ])
+        return formatted_response
+    else:
+        return "Nenhum script encontrado para os tipos fornecidos."
 
 # Comandos automáticos
 @tasks.loop(seconds=20)
@@ -428,6 +449,34 @@ async def CPF(ctx):
     formatted_cpf = f"{random_cpf[:3]}.{random_cpf[3:6]}.{random_cpf[6:9]}-{random_cpf[9:]}"
     
     await ctx.send(formatted_cpf)
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def SnapPDV(ctx):
+    Type1 = 'SnapPdv'
+    scripts = await get_scripts_type(Type1)
+    await ctx.send(scripts)
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def BancoUse(ctx):
+    Type1 = 'BancoUse'
+    scripts = await get_scripts_type(Type1)
+    await ctx.send(scripts)
+    
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def SnapPrint(ctx):
+    Type1 = 'SnapPrint'
+    scripts = await get_scripts_type(Type1)
+    await ctx.send(scripts)
+    
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def Tema(ctx):
+    Type1 = 'Tema'
+    scripts = await get_scripts_type(Type1)
+    await ctx.send(scripts)
 
 if current_branch == 'Master':
     TOKEN = bot.run(os.getenv('TOKEN'))
