@@ -161,6 +161,8 @@ async def on_message(message):
 !Logs\n\
 !Manual\n\
 !Plantao\n\
+!Plantoes\n\
+!PlantoesMes\n\
 !Senha\n\
 !SuperUsuario\n\
 !TemaBottero\n\
@@ -353,7 +355,43 @@ async def PlantoesMes(ctx):
         formatted_response = "Nenhum dado encontrado."
 
     await ctx.send(formatted_response)
-    
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def Plantoes(ctx):
+    response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
+    if response.data:
+        
+        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+        
+        # Converter as datas para objetos datetime e calcular a diferença em relação ao dia atual
+        hoje = datetime.today()
+        
+        dados_formatados = [
+            {
+                "DataInicio": datetime.strptime(item['DataInicio'], '%Y-%m-%d'),
+                "DataFinal": datetime.strptime(item['DataFinal'], '%Y-%m-%d'),
+                "Responsavel": item['Responsavel']
+            }
+            for item in response.data
+            if datetime.strptime(item['DataFinal'], '%Y-%m-%d') >= hoje
+        ]
+
+        if dados_formatados:
+            # Formatar a resposta
+            formatted_response = "\n\n".join([
+                f"**Início: **{format_date(item['DataInicio'], format='full', locale='pt_BR')}\n"
+                f"**Fim: **{format_date(item['DataFinal'], format='full', locale='pt_BR')}\n"
+                f"**Responsável: ** *->{item['Responsavel']}<-*"
+                for item in dados_formatados
+            ])
+        else:
+            formatted_response = "Nenhum plantão encontrado até o final do mês."
+    else:
+        formatted_response = "Nenhum dado encontrado."
+
+    await ctx.send(formatted_response)    
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Senha(ctx):
