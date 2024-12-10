@@ -1,4 +1,3 @@
-# Import the required modules
 import discord
 import os
 from discord.ext import commands, tasks
@@ -13,6 +12,8 @@ import asyncio
 import random
 import string
 import git
+import locale
+from babel.dates import format_date
 
 load_dotenv()
 
@@ -158,7 +159,7 @@ async def on_message(message):
 !IncidenteApp\n\
 !Logs\n\
 !Manual\n\
-!Platao\n\
+!Plantao\n\
 !Senha\n\
 !SuperUsuario\n\
 !TemaBottero\n\
@@ -308,6 +309,45 @@ async def Plantao(ctx):
             f"Até\n**Domingo: **{proximo_plantao['DataFinal'].strftime('%d/%m/%Y')}\n"
             f"**Responsável: ** *->{proximo_plantao['Responsavel']}<-*"
         )
+    else:
+        formatted_response = "Nenhum dado encontrado."
+
+    await ctx.send(formatted_response)
+    
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def PlantoesMes(ctx):
+    response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
+    if response.data:
+        
+        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+        
+        # Converter as datas para objetos datetime e calcular a diferença em relação ao dia atual
+        hoje = datetime.today()
+        ultimo_dia_mes = datetime(hoje.year, hoje.month, 1) + timedelta(days=32)
+        ultimo_dia_mes = ultimo_dia_mes.replace(day=1) - timedelta(days=1)
+        
+        dados_formatados = [
+            {
+                "DataInicio": datetime.strptime(item['DataInicio'], '%Y-%m-%d'),
+                "DataFinal": datetime.strptime(item['DataFinal'], '%Y-%m-%d'),
+                "Responsavel": item['Responsavel']
+            }
+            for item in response.data
+            if datetime.strptime(item['DataFinal'], '%Y-%m-%d') <= ultimo_dia_mes
+        ]
+
+        if dados_formatados:
+            # Formatar a resposta
+            formatted_response = "\n\n".join([
+                f"**Início: **{format_date(item['DataInicio'], format='full', locale='pt_BR')}\n"
+                f"**Fim: **{format_date(item['DataFinal'], format='full', locale='pt_BR')}\n"
+                f"**Responsável: ** *->{item['Responsavel']}<-*"
+                for item in dados_formatados
+            ])
+        else:
+            formatted_response = "Nenhum plantão encontrado até o final do mês."
     else:
         formatted_response = "Nenhum dado encontrado."
 
