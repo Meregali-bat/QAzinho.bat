@@ -19,8 +19,9 @@ load_dotenv()
 
 # Consume supabase database
 supabase_url: str = os.getenv('SUPABASE_URL')
-supabase_key: str = os.getenv('SUPABASE_KEY')
+supabase_key: str = os.getenv('SUPABASE_SERVICE_KEY')
 supabase: Client = create_client(supabase_url, supabase_key)
+
 
 repo = git.Repo(search_parent_directories=True)
 current_branch = repo.active_branch.name
@@ -107,7 +108,7 @@ async def on_member_join(member):
         border_avatar.paste(avatar, (border_size, border_size), avatar)
 
         # Open the background image
-        bg_image = Image.open('background2.png')
+        bg_image = Image.open('./Assets/background2.png')
 
         # Calculate the position to center the avatar on the background
         bg_width, bg_height = bg_image.size
