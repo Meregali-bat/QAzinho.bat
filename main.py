@@ -293,7 +293,21 @@ async def CvBottero(ctx):
     response = supabase.table("CvBottero").select("Link, Login, Password").execute()
     usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
     await ctx.send(usuario_formatado)
-        
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def CvRedecore(ctx):
+    response = supabase.table("CvRedecore").select("Link, Login, Password").execute()
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    await ctx.send(usuario_formatado)
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def AcessoMentor(ctx):
+    response = supabase.table("AcessoMentor").select("Link, Login, Password").execute()
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    await ctx.send(usuario_formatado)
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def CvToque(ctx):
