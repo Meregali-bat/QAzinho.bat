@@ -70,19 +70,12 @@ async def delete_bot_and_command_messages(channel):
 async def get_scripts_type(Type1):
     response = supabase.table('Scripts').select("Type2, Scripts").eq("Type1", Type1).execute()
     if response.data:
-        # Agrupar scripts por type2
-        scripts_by_type2 = {}
+        # Formatar a resposta
+        formatted_responses = []
         for item in response.data:
             type2 = item['Type2']
             script = item['Scripts']
-            if type2 not in scripts_by_type2:
-                scripts_by_type2[type2] = []
-            scripts_by_type2[type2].append(script)
-        
-        # Formatar a resposta
-        formatted_responses = []
-        for type2, scripts in scripts_by_type2.items():
-            formatted_response = f"**{type2}**:\n" + "\n".join([f"```sql\n{script}\n```" for script in scripts])
+            formatted_response = f"**{type2}**:\n```sql\n{script}\n```"
             formatted_responses.append(formatted_response)
         
         return formatted_responses
