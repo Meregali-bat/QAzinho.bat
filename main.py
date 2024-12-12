@@ -80,13 +80,14 @@ async def get_scripts_type(Type1):
             scripts_by_type2[type2].append(script)
         
         # Formatar a resposta
-        formatted_response = "\n".join([
-            f"**{type2}**:" + "\n".join([f"```sql\n{script}```" for script in scripts])
-            for type2, scripts in scripts_by_type2.items()
-        ])
-        return formatted_response
+        formatted_responses = []
+        for type2, scripts in scripts_by_type2.items():
+            formatted_response = f"**{type2}**:\n" + "\n".join([f"```sql\n{script}\n```" for script in scripts])
+            formatted_responses.append(formatted_response)
+        
+        return formatted_responses
     else:
-        return "Nenhum script encontrado para os tipos fornecidos."
+        return ["Nenhum script encontrado para os tipos fornecidos."]
 
 # Comandos automáticos
 @tasks.loop(seconds=20)
@@ -173,21 +174,24 @@ Utilize !Comandos no canal {canal_especifico_obj.mention} para ver os comandos v
 async def on_message(message):
     if bot.user.mentioned_in(message):
         response = '```Os comandos disponíveis são:\n\
+!AcessoMentor\n\
 !Anydesk\n\
+!BancoUse\n\
 !CPF\n\
 !CvBottero\n\
+!CvRedecore\n\
 !CvToque\n\
 !Incidente\n\
 !IncidenteApp\n\
-!Logs\n\
 !Manual\n\
 !Plantao\n\
 !Plantoes\n\
 !PlantoesMes\n\
 !Senha\n\
+!SnapPdv\n\
+!SnapPrint\n\
 !SuperUsuario\n\
-!TemaBottero\n\
-!TemaMercado```'
+!Temas```'
         await message.channel.send(response)
     
     # Processar outros comandos normalmente
@@ -216,32 +220,6 @@ async def IncidenteApp(ctx):
     IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApp']}```" for item in response.data])
     await ctx.send(IncidenteFormatado)
     
-@bot.command()
-@canal_especifico('qazinho-comandos')
-async def TemaMercado(ctx):
-    response = ' ```sql\n\
-update CONFIGURACOES \n\
-set CONFIGURACOES.TEMAPDV = "Market" ```'
-    await ctx.send(response)
-
-@bot.command()
-@canal_especifico('qazinho-comandos')
-async def TemaBottero(ctx):
-    response = ' ```sql\n\
-update CONFIGURACOES \n\
-set CONFIGURACOES.TEMAPDV = "Botterocampanha" ```'
-    await ctx.send(response)
-
-@bot.command()
-@canal_especifico('qazinho-comandos')
-async def Logs(ctx):  
-    response = ' ```sql\n\
-select *\n\
-from logs l\n\
-order by id desc\n\
-limit 100 ```'
-    await ctx.send(response)
-
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def SuperUsuario(ctx):
@@ -466,32 +444,36 @@ async def CPF(ctx):
 
 @bot.command()
 @canal_especifico('qazinho-comandos')
-async def SnapPDV(ctx):
+async def SnapPdv(ctx):
     Type1 = 'SnapPdv'
     scripts = await get_scripts_type(Type1)
-    await ctx.send(scripts)
+    for script in scripts:
+        await ctx.send(script)
 
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def BancoUse(ctx):
     Type1 = 'BancoUse'
     scripts = await get_scripts_type(Type1)
-    await ctx.send(scripts)
+    for script in scripts:
+        await ctx.send(script)
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def SnapPrint(ctx):
     Type1 = 'SnapPrint'
     scripts = await get_scripts_type(Type1)
-    await ctx.send(scripts)
+    for script in scripts:
+        await ctx.send(script)
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Tema(ctx):
     Type1 = 'Tema'
     scripts = await get_scripts_type(Type1)
-    await ctx.send(scripts)
-
+    for script in scripts:
+        await ctx.send(script)
+        
 if current_branch == 'Master':
     TOKEN = bot.run(os.getenv('TOKEN'))
 else:
