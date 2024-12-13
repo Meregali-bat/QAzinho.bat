@@ -81,6 +81,7 @@ async def get_scripts_type(Type1):
             type2 = item['Type2']
             script = item['Scripts']
             formatted_response = f"**{type2}**:\n```sql\n{script}\n```"
+
             if len(formatted_response) > 2000:
                 filename = write_to_sql_file(script)
                 formatted_responses.append((None, filename))
@@ -449,6 +450,7 @@ async def CPF(ctx):
 async def SnapPdv(ctx):
     Type1 = 'SnapPdv'
     scripts = await get_scripts_type(Type1)
+
     for script, filename in scripts:
         if filename:
             if os.path.exists(filename):
@@ -458,11 +460,13 @@ async def SnapPdv(ctx):
                     os.remove(filename)
         else:
             await ctx.send(script)
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def BancoUse(ctx):
     Type1 = 'BancoUse'
     scripts = await get_scripts_type(Type1)
+
     for script, filename in scripts:
         if filename:
             if os.path.exists(filename):
@@ -472,12 +476,13 @@ async def BancoUse(ctx):
                     os.remove(filename)
         else:
             await ctx.send(script)
-    
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def SnapPrint(ctx):
     Type1 = 'SnapPrint'
     scripts = await get_scripts_type(Type1)
+
     for script, filename in scripts:
         if filename:
             if os.path.exists(filename):
@@ -487,12 +492,14 @@ async def SnapPrint(ctx):
                     os.remove(filename)
         else:
             await ctx.send(script)
+
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Tema(ctx):
     Type1 = 'Tema'
     scripts = await get_scripts_type(Type1)
+
     for script, filename in scripts:
         if filename:
             if os.path.exists(filename):
@@ -502,6 +509,7 @@ async def Tema(ctx):
                     os.remove(filename)
         else:
             await ctx.send(script)
+
         
 if current_branch == 'Master':
     TOKEN = bot.run(os.getenv('TOKEN'))
