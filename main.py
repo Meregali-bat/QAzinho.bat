@@ -301,7 +301,14 @@ async def Manual(ctx):
     response = supabase.table("Manual").select("Link").execute()
     reponse_formatada = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n" for item in response.data])
     await ctx.send(reponse_formatada)
-    
+
+@bot.command()
+@canal_especifico('qazinho-comandos')
+async def Zap4You(ctx):
+    response = supabase.table("Zap4You").select("Link, Login").execute()
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```" for item in response.data])
+    await ctx.send(usuario_formatado)
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Plantao(ctx):
