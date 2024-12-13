@@ -66,6 +66,11 @@ async def delete_bot_and_command_messages(channel):
                         retry_after = e.retry_after
                         print(f"Rate limited. Retrying in {retry_after} seconds.")
                         await asyncio.sleep(retry_after)
+             
+def write_to_sql_file(script, filename="script.sql"):
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(script)
+    return filename
                         
 async def get_scripts_type(Type1):
     response = supabase.table('Scripts').select("Type2, Scripts").eq("Type1", Type1).execute()
@@ -76,11 +81,16 @@ async def get_scripts_type(Type1):
             type2 = item['Type2']
             script = item['Scripts']
             formatted_response = f"**{type2}**:\n```sql\n{script}\n```"
-            formatted_responses.append(formatted_response)
+
+            if len(formatted_response) > 2000:
+                filename = write_to_sql_file(script)
+                formatted_responses.append((None, filename))
+            else:
+                formatted_responses.append((formatted_response, None))
         
         return formatted_responses
     else:
-        return ["Nenhum script encontrado para os tipos fornecidos."]
+        return [("Nenhum script encontrado para os tipos fornecidos.", None)]
 
 # Comandos automáticos
 @tasks.loop(seconds=20)
@@ -440,32 +450,66 @@ async def CPF(ctx):
 async def SnapPdv(ctx):
     Type1 = 'SnapPdv'
     scripts = await get_scripts_type(Type1)
-    for script in scripts:
-        await ctx.send(script)
+
+    for script, filename in scripts:
+        if filename:
+            if os.path.exists(filename):
+                try:
+                    await ctx.send(file=discord.File(filename))
+                finally:
+                    os.remove(filename)
+        else:
+            await ctx.send(script)
 
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def BancoUse(ctx):
     Type1 = 'BancoUse'
     scripts = await get_scripts_type(Type1)
-    for script in scripts:
-        await ctx.send(script)
-    
+
+    for script, filename in scripts:
+        if filename:
+            if os.path.exists(filename):
+                try:
+                    await ctx.send(file=discord.File(filename))
+                finally:
+                    os.remove(filename)
+        else:
+            await ctx.send(script)
+
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def SnapPrint(ctx):
     Type1 = 'SnapPrint'
     scripts = await get_scripts_type(Type1)
-    for script in scripts:
-        await ctx.send(script)
+
+    for script, filename in scripts:
+        if filename:
+            if os.path.exists(filename):
+                try:
+                    await ctx.send(file=discord.File(filename))
+                finally:
+                    os.remove(filename)
+        else:
+            await ctx.send(script)
+
     
 @bot.command()
 @canal_especifico('qazinho-comandos')
 async def Tema(ctx):
     Type1 = 'Tema'
     scripts = await get_scripts_type(Type1)
-    for script in scripts:
-        await ctx.send(script)
+
+    for script, filename in scripts:
+        if filename:
+            if os.path.exists(filename):
+                try:
+                    await ctx.send(file=discord.File(filename))
+                finally:
+                    os.remove(filename)
+        else:
+            await ctx.send(script)
+
         
 if current_branch == 'Master':
     TOKEN = bot.run(os.getenv('TOKEN'))
