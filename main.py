@@ -285,8 +285,9 @@ async def UpdateHash(ctx, nova_senha: str):
         await ctx.send(f'Este comando só deve ser utilizado no canal: {canal_especifico_obj.mention}.',delete_after=5)
         await ctx.message.delete()
         return
-    else:  
-        response = supabase.table("SuperUsuario").update({"password": nova_senha}).eq("id", 1).execute()
+    else:
+        nova_senha_codificada = base64.b64encode(nova_senha.encode()).decode()
+        response = supabase.table("SuperUsuario").update({"password": nova_senha_codificada}).eq("id", 1).execute()
     
     if response.data:
         # Enviar mensagem de confirmação no canal onde a atualização foi feita
@@ -301,7 +302,8 @@ async def UpdateHash(ctx, nova_senha: str):
             if cargo_especifico:
                 usuario = supabase.table("SuperUsuario").select("login, password").execute()
                 if usuario:
-                    usuario_formatado = "\n\n".join([f"## 🢡Login🢠\n```{item['login']}```\n## 🢡Password🢠\n```{item['password']}```" for item in response.data])
+                    decoded_response = decode_data(response.data)
+                    usuario_formatado = "\n\n".join([f"## 🢡Login🢠\n```{item['login']}```\n## 🢡Password🢠\n```{item['password']}```" for item in decoded_response])
                 await canal_aviso.send(f"{cargo_especifico.mention} \n# 🢡SuperUsuário Atualizado🢠\n\n{usuario_formatado}")
             else:
                 await canal_aviso.send("A senha foi alterada com sucesso, mas o cargo específico não foi encontrado.")
