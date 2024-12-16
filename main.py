@@ -14,6 +14,7 @@ import string
 import git
 import locale
 from babel.dates import format_date
+import base64
 
 load_dotenv()
 
@@ -66,6 +67,21 @@ async def delete_bot_and_command_messages(channel):
                         retry_after = e.retry_after
                         print(f"Rate limited. Retrying in {retry_after} seconds.")
                         await asyncio.sleep(retry_after)
+                        
+async def delete_superusuario(channel):
+    now = datetime.now(timezone.utc)
+    channel = discord.utils.get(bot.get_all_channels(), name='𝕾𝖚𝖕𝖊𝖗𝖀𝖘𝖚𝖆𝖗𝖎𝖔🔧')
+    async for message in channel.history(limit=100):
+            message_age = now - message.created_at
+            if message_age > timedelta(days=3):
+                try:
+                    await message.delete()
+                    await asyncio.sleep(1)
+                except discord.errors.HTTPException as e:
+                    if e.status == 429:
+                        retry_after = e.retry_after
+                        print(f"Rate limited. Retrying in {retry_after} seconds.")
+                        await asyncio.sleep(retry_after)
              
 def write_to_sql_file(script, filename="script.sql"):
     with open(filename, 'w', encoding='utf-8') as file:
@@ -90,17 +106,37 @@ async def get_scripts_type(Type1):
         return formatted_responses
     else:
         return [("Nenhum script encontrado para os tipos fornecidos.", None)]
+    
+
+def decode_data(data):
+    decoded_data = []
+    for item in data:
+        decoded_item = {}
+        for key, value in item.items():
+            if isinstance(value, str):
+                try:
+                    decoded_value = base64.b64decode(value).decode('utf-8')
+                except (base64.binascii.Error, UnicodeDecodeError):
+                    decoded_value = value
+                decoded_item[key] = decoded_value
+            else:
+                decoded_item[key] = value
+        decoded_data.append(decoded_item)
+    return decoded_data
 
 # Comandos automáticos
 @tasks.loop(seconds=20)
 async def clear_channel():
-    channel = discord.utils.get(bot.get_all_channels(), name='qazinho-comandos') 
+    channel = discord.utils.get(bot.get_all_channels(), name='𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+    channelSuperUsuario = discord.utils.get(bot.get_all_channels(), name='𝕾𝖚𝖕𝖊𝖗𝖀𝖘𝖚𝖆𝖗𝖎𝖔🔧') 
     if channel:
         await delete_bot_and_command_messages(channel)
+    if channelSuperUsuario:
+        await delete_superusuario(channelSuperUsuario)
 
 @bot.event
 async def on_member_join(member):
-    channel = discord.utils.get(member.guild.text_channels, name='hora_do_café')
+    channel = discord.utils.get(member.guild.text_channels, name='ℍ𝕠𝕣𝕒𝔻𝕠ℂ𝕒𝕗𝕖☕')
     if channel:
         # Download the user's avatar
         async with aiohttp.ClientSession() as session:
@@ -165,7 +201,7 @@ async def on_member_join(member):
 
 @bot.event
 async def on_command_error(ctx, error):
-    canal_especifico = 'qazinho-comandos'
+    canal_especifico = '𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖'
     canal_especifico_obj = discord.utils.get(ctx.guild.text_channels, name=canal_especifico)
     if isinstance(error, commands.CommandNotFound):
         await ctx.send(f'Comando não reconhecido. Por favor, use um comando válido. \n\
@@ -193,7 +229,7 @@ async def on_message(message):
 !SnapPdv\n\
 !SnapPrint\n\
 !SuperUsuario\n\
-!Temas```'
+!Tema```'
         await message.channel.send(response)
     
     # Processar outros comandos normalmente
@@ -201,34 +237,40 @@ async def on_message(message):
 
 #Comandos manuais
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Anydesk(ctx):
     response = supabase.table("AnydeskSuporte").select("Anydesk, Password").execute()
-    usuario_formatado = "\n\n".join([f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    decoded_response = decode_data(response.data)
+    usuario_formatado = "\n\n".join([
+        f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n## 🢡Password🢠\n```{item['Password']}```"
+        for item in decoded_response
+    ])
     await ctx.send(usuario_formatado)
+
     
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Incidente(ctx):
     response = supabase.table("IncidenteAPI").select("LayoutIncApi").execute()
     IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApi']}```" for item in response.data])
     await ctx.send(IncidenteFormatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def IncidenteApp(ctx):
     response = supabase.table("IncidenteAPP").select("LayoutIncApp").execute()
     IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApp']}```" for item in response.data])
     await ctx.send(IncidenteFormatado)
     
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def SuperUsuario(ctx):
     response = supabase.table("SuperUsuario").select("login, password").execute()
+    decoded_response = decode_data(response.data)
     if response.data:
         # Formatar a resposta para uma string legível, pulando a coluna ID
-        formatted_response = "\n\n".join([f"# 🢡SuperUsuário🢠\n ## 🢡Login🢠\n```{item['login']}```\n## 🢡Senha🢠\n```{item['password']}```" for item in response.data])
+        formatted_response = "\n\n".join([f"# 🢡SuperUsuário🢠\n ## 🢡Login🢠\n```{item['login']}```\n## 🢡Senha🢠\n```{item['password']}```" for item in decoded_response])
     else:
         formatted_response = "Nenhum dado encontrado."
 
@@ -252,7 +294,7 @@ async def UpdateHash(ctx, nova_senha: str):
         # Obter o cargo específico
         cargo_especifico = discord.utils.get(ctx.guild.roles, name='CX') 
         # Obter o canal de aviso
-        canal_aviso = discord.utils.get(ctx.guild.text_channels, name='superusuario')
+        canal_aviso = discord.utils.get(ctx.guild.text_channels, name='𝕾𝖚𝖕𝖊𝖗𝖀𝖘𝖚𝖆𝖗𝖎𝖔🔧')
         
         if canal_aviso:
             if cargo_especifico:
@@ -268,49 +310,53 @@ async def UpdateHash(ctx, nova_senha: str):
         await ctx.send(f"Erro ao atualizar a senha: {response}")
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def CvBottero(ctx):
     response = supabase.table("CvBottero").select("Link, Login, Password").execute()
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    decoded_response = decode_data(response.data)
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
     await ctx.send(usuario_formatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def CvRedecore(ctx):
     response = supabase.table("CvRedecore").select("Link, Login, Password").execute()
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    decoded_response = decode_data(response.data)
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
     await ctx.send(usuario_formatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def AcessoMentor(ctx):
     response = supabase.table("AcessoMentor").select("Link, Login, Password").execute()
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    decoded_response = decode_data(response.data)
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
     await ctx.send(usuario_formatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def CvToque(ctx):
     response = supabase.table("CvToque").select("Link, Login, Password").execute()
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in response.data])
+    decoded_response = decode_data(response.data)
+    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
     await ctx.send(usuario_formatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Manual(ctx):
     response = supabase.table("Manual").select("Link").execute()
     reponse_formatada = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n" for item in response.data])
     await ctx.send(reponse_formatada)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Zap4You(ctx):
     response = supabase.table("Zap4You").select("Link, Login").execute()
     usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```" for item in response.data])
     await ctx.send(usuario_formatado)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Plantao(ctx):
     response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
     if response.data:
@@ -341,7 +387,7 @@ async def Plantao(ctx):
     
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def PlantoesMes(ctx):
     response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
     if response.data:
@@ -379,7 +425,7 @@ async def PlantoesMes(ctx):
     await ctx.send(formatted_response)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Plantoes(ctx):
     response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
     if response.data:
@@ -415,13 +461,13 @@ async def Plantoes(ctx):
     await ctx.send(formatted_response)    
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Senha(ctx):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
     await ctx.send(random_string)
     
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def CPF(ctx):
     def generate_cpf():
         # Gerar os primeiros 9 dígitos aleatórios
@@ -452,7 +498,7 @@ async def CPF(ctx):
     await ctx.send(formatted_cpf)
 
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def SnapPdv(ctx):
     Type1 = 'SnapPdv'
     scripts = await get_scripts_type(Type1)
@@ -466,7 +512,7 @@ async def SnapPdv(ctx):
         else:
             await ctx.send(script)
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def BancoUse(ctx):
     Type1 = 'BancoUse'
     scripts = await get_scripts_type(Type1)
@@ -481,7 +527,7 @@ async def BancoUse(ctx):
             await ctx.send(script)
     
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def SnapPrint(ctx):
     Type1 = 'SnapPrint'
     scripts = await get_scripts_type(Type1)
@@ -496,7 +542,7 @@ async def SnapPrint(ctx):
             await ctx.send(script)
     
 @bot.command()
-@canal_especifico('qazinho-comandos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Tema(ctx):
     Type1 = 'Tema'
     scripts = await get_scripts_type(Type1)
