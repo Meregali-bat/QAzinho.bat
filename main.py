@@ -17,6 +17,7 @@ from Functions.canal_especifico import canal_especifico
 from Functions.delete_messages import delete_bot_and_command_messages, delete_superusuario
 from Functions.get_scripts import get_scripts_type
 from Database.database import supabase
+from Functions.generate_cpf import generate_cpf
 
 load_dotenv()
 
@@ -228,7 +229,6 @@ async def Plantao(ctx):
 
     await ctx.send(formatted_response)
     
-
 @bot.command()
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def PlantoesMes(ctx):
@@ -312,29 +312,8 @@ async def Senha(ctx):
 @bot.command()
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def CPF(ctx):
-    def generate_cpf():
-        # Gerar os primeiros 9 dígitos aleatórios
-        cpf = [random.randint(0, 9) for _ in range(9)]
-
-        # Calcular o primeiro dígito verificador
-        sum1 = sum((cpf[i] * (10 - i) for i in range(9)))
-        digit1 = 11 - (sum1 % 11)
-        if digit1 >= 10:
-            digit1 = 0
-        cpf.append(digit1)
-
-        # Calcular o segundo dígito verificador
-        sum2 = sum((cpf[i] * (11 - i) for i in range(10)))
-        digit2 = 11 - (sum2 % 11)
-        if digit2 >= 10:
-            digit2 = 0
-        cpf.append(digit2)
-
-        return ''.join(map(str, cpf))
-
     # Gerar um CPF válido
     random_cpf = generate_cpf()
-    
     # Formatar o CPF
     formatted_cpf = f"{random_cpf[:3]}.{random_cpf[3:6]}.{random_cpf[6:9]}-{random_cpf[9:]}"
     
@@ -388,7 +367,6 @@ async def SnapPrint(ctx):
         else:
             await ctx.send(script)
 
-    
 @bot.command()
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Tema(ctx):
