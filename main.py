@@ -251,6 +251,8 @@ async def PlantoesMes(ctx):
             for item in response.data
             if datetime.strptime(item['DataFinal'], '%Y-%m-%d') <= ultimo_dia_mes
         ]
+        
+        dados_formatados.sort(key=lambda x: x['DataInicio'])
 
         if dados_formatados:
             # Formatar a resposta
@@ -271,8 +273,8 @@ async def PlantoesMes(ctx):
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Plantoes(ctx):
     response = supabase.table("Plantoes").select("DataInicio, DataFinal, Responsavel").execute()
+    
     if response.data:
-        
         locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
         
         # Converter as datas para objetos datetime e calcular a diferença em relação ao dia atual
@@ -288,6 +290,9 @@ async def Plantoes(ctx):
             if datetime.strptime(item['DataFinal'], '%Y-%m-%d') >= hoje
         ]
 
+        # Ordenar a lista por DataInicio
+        dados_formatados.sort(key=lambda x: x['DataInicio'])
+
         if dados_formatados:
             # Formatar a resposta
             formatted_response = "\n\n".join([
@@ -301,7 +306,7 @@ async def Plantoes(ctx):
     else:
         formatted_response = "Nenhum dado encontrado."
 
-    await ctx.send(formatted_response)    
+    await ctx.send(formatted_response)
 
 @bot.command()
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
