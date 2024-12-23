@@ -49,17 +49,22 @@ async def on_member_join(member):
 async def on_command_error(ctx, error):
     await command_error(ctx, error)
 
-#Comandos manuais
 @bot.tree.command(name="anydesk", description='anydesk do computador do suporte')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def anydesk(interaction: discord.Interaction):
-    response = supabase.table("AnydeskSuporte").select("Anydesk, Password").execute()
+    response = supabase.table("AnydeskSuporte").select("Anydesk, Password, Type").execute()
     decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([
-        f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n## 🢡Password🢠\n```{item['Password']}```"
-        for item in decoded_response
-    ])
-    await interaction.response.send_message(usuario_formatado, ephemeral=True)
+
+    # Deferir a resposta para evitar o tempo limite
+    await interaction.response.defer(ephemeral=True)
+
+    for item in decoded_response:
+        usuario_formatado = (
+            f"## 🢡{item['Type']}🢠\n"
+            f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n"
+            f"## 🢡Password🢠\n```{item['Password']}```"
+        )
+        await interaction.followup.send(usuario_formatado, ephemeral=True)
 
 @bot.tree.command(name="incidente", description='Layout de incidente da API')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
