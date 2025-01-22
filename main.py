@@ -10,9 +10,9 @@ import locale
 from babel.dates import format_date
 import base64
 import json
-import pandas as pd
 import aiohttp
 import io
+
 
 from Functions.command_error import command_error
 from Functions.new_member import new_member
@@ -27,6 +27,7 @@ load_dotenv()
 
 repo = git.Repo(search_parent_directories=True)
 current_branch = repo.active_branch.name
+
 
 # Create a Discord client instance and set the command prefix
 intents = discord.Intents.default()
@@ -57,7 +58,6 @@ async def anydesk(interaction: discord.Interaction):
     response = supabase.table("AnydeskSuporte").select("Anydesk, Password, Type").execute()
     decoded_response = decode_data(response.data)
 
-    # Deferir a resposta para evitar o tempo limite
     await interaction.response.defer(ephemeral=True)
 
     for item in decoded_response:
