@@ -11,6 +11,8 @@ from babel.dates import format_date
 import base64
 import json
 import pandas as pd
+import aiohttp
+import io
 
 from Functions.command_error import command_error
 from Functions.new_member import new_member
@@ -420,6 +422,21 @@ async def LojasBottero(interaction: discord.Interaction):
     await interaction.response.send_message("Aqui está a lista de lojas Bottero:", file=discord.File("lojas_bottero.json"))
 
     os.remove("lojas_bottero.json")
+    
+@bot.tree.command(name="qualita", description='Imagem dos contatos da qualitá')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+async def Qualita(interaction: discord.Interaction):
+    response = supabase.table("Qualita").select("link").execute()
+    links = [item['link'] for item in response.data]
+
+    async with aiohttp.ClientSession() as session:
+        for link in links:
+            async with session.get(link) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    await interaction.response.send_message(file=discord.File(fp=io.BytesIO(data), filename="image.png"))
+                else:
+                    await interaction.response.send_message(f"Falha ao baixar a imagem: {link}")
 
 @bot.event
 async def on_ready():
