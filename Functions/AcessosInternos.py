@@ -31,6 +31,7 @@ async def show_type1_buttons(interaction: discord.Interaction):
     select = supabase.table("AcessosInternos").select("*").execute()
     view = View()
     type1_dict = {}
+    original_user = interaction.user
 
     for Type1 in select.data:
         type1_value = Type1['Type1']
@@ -41,6 +42,9 @@ async def show_type1_buttons(interaction: discord.Interaction):
             buttonType1 = Button(label=type1_value, style=button_style, emoji=button_emoji)
 
             async def button_callback(interaction: discord.Interaction, type1=type1_value):
+                if interaction.user != original_user:
+                    await interaction.response.send_message("Você não tem permissão para interagir com este botão.", ephemeral=True)
+                    return
                 await delete_previous_messages(interaction)
                 selectbasedonType1 = supabase.table("AcessosInternos").select("*").eq("Type1", type1).execute()
                 view = View()
@@ -49,9 +53,15 @@ async def show_type1_buttons(interaction: discord.Interaction):
                 back_button = Button(label="Voltar", style=ButtonStyle.secondary, emoji="↩️")
 
                 async def back_callback(interaction: discord.Interaction):
+                    if interaction.user != original_user:
+                        await interaction.response.send_message("Você não tem permissão para interagir com este botão.", ephemeral=True)
+                        return
                     await show_type1_buttons(interaction)
 
                 async def delete_history(interaction: discord.Interaction):
+                    if interaction.user != original_user:
+                        await interaction.response.send_message("Você não tem permissão para interagir com este botão.", ephemeral=True)
+                        return
                     await interaction.channel.purge(limit=None, check=lambda m: m.author == interaction.client.user)
 
                 back_button.callback = back_callback
@@ -61,6 +71,9 @@ async def show_type1_buttons(interaction: discord.Interaction):
                     buttonType2 = Button(label=Type2['Type2'], style=button_style, emoji=button_emoji)
 
                     async def type2_callback(interaction: discord.Interaction, type1=type1, type2=Type2['Type2']):
+                        if interaction.user != original_user:
+                            await interaction.response.send_message("Você não tem permissão para interagir com este botão.", ephemeral=True)
+                            return
                         await delete_previous_messages(interaction)
                         response = supabase.table("AcessosInternos").select("Link, Login, Password").eq("Type1", type1).eq("Type2", type2).execute()
                         decoded_user = decode_data(response.data)
