@@ -1,4 +1,6 @@
 import discord
+from discord import ButtonStyle
+from discord.ui import Button, View
 import os
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
@@ -22,6 +24,7 @@ from Functions.delete_messages import delete_bot_and_command_messages, delete_su
 from Functions.get_scripts import get_scripts_type
 from Database.database import supabase
 from Functions.generate_cpf import generate_cpf
+from Functions.AcessosInternos import show_type1_buttons
 
 load_dotenv()
 
@@ -33,6 +36,8 @@ current_branch = repo.active_branch.name
 intents = discord.Intents.default()
 intents.message_content = True 
 bot = commands.Bot(command_prefix='!', intents=intents)
+
+
 
 # Comandos automáticos
 @tasks.loop(seconds=20)
@@ -51,22 +56,6 @@ async def on_member_join(member):
 @bot.event
 async def on_command_error(ctx, error):
     await command_error(ctx, error)
-
-@bot.tree.command(name="anydesk", description='anydesk do computador do suporte')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def anydesk(interaction: discord.Interaction):
-    response = supabase.table("AnydeskSuporte").select("Anydesk, Password, Type").execute()
-    decoded_response = decode_data(response.data)
-
-    await interaction.response.defer(ephemeral=True)
-
-    for item in decoded_response:
-        usuario_formatado = (
-            f"## 🢡{item['Type']}🢠\n"
-            f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n"
-            f"## 🢡Password🢠\n```{item['Password']}```"
-        )
-        await interaction.followup.send(usuario_formatado, ephemeral=True)
 
 @bot.tree.command(name="incidente", description='Layout de incidente da API')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
@@ -130,52 +119,12 @@ async def UpdateHash(ctx, nova_senha: str):
     else:
         await ctx.send(f"Erro ao atualizar a senha: {response}")
 
-@bot.tree.command(name="cvbottero", description='Login de adm para o CV Bottero')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvBottero(interaction: discord.Interaction):
-    response = supabase.table("CvBottero").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="cvredecore", description='Login de adm para o CV Redecore')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvRedecore(interaction: discord.Interaction):
-    response = supabase.table("CvRedecore").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="acessomentor", description='Login do Mentor')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def AcessoMentor(interaction: discord.Interaction):
-    response = supabase.table("AcessoMentor").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="cvtoque", description='Login de adm para o CV Toque')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvToque(interaction: discord.Interaction):
-    response = supabase.table("CvToque").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
 @bot.tree.command(name="manual", description='link para o manual de sobrevivência')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Manual(interaction: discord.Interaction):
     response = supabase.table("Manual").select("Link").execute()
     response_formatada = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n" for item in response.data])
     await interaction.response.send_message(response_formatada)
-
-@bot.tree.command(name="zap4you", description='Login do Zap4You')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def Zap4You(interaction: discord.Interaction):
-    response = supabase.table("Zap4You").select("Link, Login").execute()
-    decoded_user = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```" for item in decoded_user])
-    await interaction.response.send_message(usuario_formatado)
 
 @bot.tree.command(name="plantao", description='Data e responsável pelo plantão mais próximo')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
@@ -437,6 +386,12 @@ async def Qualita(interaction: discord.Interaction):
                     await interaction.response.send_message(file=discord.File(fp=io.BytesIO(data), filename="image.png"))
                 else:
                     await interaction.response.send_message(f"Falha ao baixar a imagem: {link}")
+
+
+@bot.tree.command(name="acessosinternos", description='Acessos Internos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+async def AcessosInternos(interaction: discord.Interaction):
+    await show_type1_buttons(interaction)
 
 @bot.event
 async def on_ready():
