@@ -1,0 +1,7 @@
+discord.py
+python-dotenv
+GitPython
+babel
+aiohttp
+Pillow
+supabase
