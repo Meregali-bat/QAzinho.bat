@@ -34,6 +34,10 @@ intents = discord.Intents.default()
 intents.message_content = True 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+#Classes
+from Classes.SenhaView import SenhaView
+from Classes.CPFView import CPFView
+
 # Comandos automáticos
 @tasks.loop(seconds=20)
 async def clear_channel():
@@ -218,7 +222,8 @@ async def Plantoes(interaction: discord.Interaction):
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def Senha(interaction: discord.Interaction):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-    await interaction.response.send_message(random_string)
+    view = SenhaView(interaction.user)
+    await interaction.response.send_message(random_string, view=view)
     
 @bot.tree.command(name="cpf", description='Gera um CPF válido')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
@@ -228,7 +233,8 @@ async def CPF(interaction: discord.Interaction):
     # Formatar o CPF
     formatted_cpf = f"{random_cpf[:3]}.{random_cpf[3:6]}.{random_cpf[6:9]}-{random_cpf[9:]}"
     
-    await interaction.response.send_message(formatted_cpf)
+    view = CPFView(interaction.user)
+    await interaction.response.send_message(formatted_cpf, view=view)
 
 @bot.tree.command(name="lojasbottero", description="mostra uma planilha com as lojas botteros separando por franqueadas ou não")
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
