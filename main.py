@@ -13,21 +13,21 @@ import json
 import aiohttp
 import io
 
-
 from Functions.command_error import command_error
 from Functions.new_member import new_member
 from Functions.decode_data import decode_data
 from Functions.canal_especifico import canal_especifico
 from Functions.delete_messages import delete_bot_and_command_messages, delete_superusuario
-from Functions.get_scripts import get_scripts_type
+from Functions.get_scripts import show_scripts_buttons
+from Functions.Incidentes import show_incidentes_buttons
 from Database.database import supabase
 from Functions.generate_cpf import generate_cpf
+from Functions.AcessosInternos import show_type1_buttons
 
 load_dotenv()
 
 repo = git.Repo(search_parent_directories=True)
 current_branch = repo.active_branch.name
-
 
 # Create a Discord client instance and set the command prefix
 intents = discord.Intents.default()
@@ -52,36 +52,11 @@ async def on_member_join(member):
 async def on_command_error(ctx, error):
     await command_error(ctx, error)
 
-@bot.tree.command(name="anydesk", description='anydesk do computador do suporte')
+@bot.tree.command(name="incidentes", description='Layouts de incidentes')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def anydesk(interaction: discord.Interaction):
-    response = supabase.table("AnydeskSuporte").select("Anydesk, Password, Type").execute()
-    decoded_response = decode_data(response.data)
+async def incidentes(interaction: discord.Interaction):
+    await show_incidentes_buttons(interaction)
 
-    await interaction.response.defer(ephemeral=True)
-
-    for item in decoded_response:
-        usuario_formatado = (
-            f"## 🢡{item['Type']}🢠\n"
-            f"## 🢡Anydesk🢠\n```{item['Anydesk']}```\n"
-            f"## 🢡Password🢠\n```{item['Password']}```"
-        )
-        await interaction.followup.send(usuario_formatado, ephemeral=True)
-
-@bot.tree.command(name="incidente", description='Layout de incidente da API')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def Incidente(interaction: discord.Interaction):
-    response = supabase.table("IncidenteAPI").select("LayoutIncApi").execute()
-    IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApi']}```" for item in response.data])
-    await interaction.response.send_message(IncidenteFormatado, ephemeral=True)
-
-@bot.tree.command(name="incidenteapp", description='Layout de incidente do APP')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def IncidenteApp(interaction: discord.Interaction):
-    response = supabase.table("IncidenteAPP").select("LayoutIncApp").execute()
-    IncidenteFormatado = "\n\n".join([f"```{item['LayoutIncApp']}```" for item in response.data])
-    await interaction.response.send_message(IncidenteFormatado)
-    
 @bot.tree.command(name="superusuario", description='Login e senha do superusuário')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def SuperUsuario(interaction: discord.Interaction):
@@ -129,53 +104,6 @@ async def UpdateHash(ctx, nova_senha: str):
             await ctx.send("Senha atualizada com sucesso, mas o canal de aviso não foi encontrado.")
     else:
         await ctx.send(f"Erro ao atualizar a senha: {response}")
-
-@bot.tree.command(name="cvbottero", description='Login de adm para o CV Bottero')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvBottero(interaction: discord.Interaction):
-    response = supabase.table("CvBottero").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="cvredecore", description='Login de adm para o CV Redecore')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvRedecore(interaction: discord.Interaction):
-    response = supabase.table("CvRedecore").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="acessomentor", description='Login do Mentor')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def AcessoMentor(interaction: discord.Interaction):
-    response = supabase.table("AcessoMentor").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="cvtoque", description='Login de adm para o CV Toque')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def CvToque(interaction: discord.Interaction):
-    response = supabase.table("CvToque").select("Link, Login, Password").execute()
-    decoded_response = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```\n## 🢡Password🢠\n```{item['Password']}```" for item in decoded_response])
-    await interaction.response.send_message(usuario_formatado)
-
-@bot.tree.command(name="manual", description='link para o manual de sobrevivência')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def Manual(interaction: discord.Interaction):
-    response = supabase.table("Manual").select("Link").execute()
-    response_formatada = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n" for item in response.data])
-    await interaction.response.send_message(response_formatada)
-
-@bot.tree.command(name="zap4you", description='Login do Zap4You')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def Zap4You(interaction: discord.Interaction):
-    response = supabase.table("Zap4You").select("Link, Login").execute()
-    decoded_user = decode_data(response.data)
-    usuario_formatado = "\n\n".join([f"## 🢡Link🢠\n<{item['Link']}>\n## 🢡Login🢠\n```{item['Login']}```" for item in decoded_user])
-    await interaction.response.send_message(usuario_formatado)
 
 @bot.tree.command(name="plantao", description='Data e responsável pelo plantão mais próximo')
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
@@ -302,106 +230,6 @@ async def CPF(interaction: discord.Interaction):
     
     await interaction.response.send_message(formatted_cpf)
 
-@bot.tree.command(name="snappdv", description='Scripts usados no SnapPdv')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def SnapPdv(interaction: discord.Interaction):
-    Type1 = 'SnapPdv'
-    scripts = await get_scripts_type(Type1)
-
-    first_response = True
-    for script, filename in scripts:
-        if filename:
-            if os.path.exists(filename):
-                try:
-                    if first_response:
-                        await interaction.response.send_message(file=discord.File(filename))
-                        first_response = False
-                    else:
-                        await interaction.followup.send(file=discord.File(filename))
-                finally:
-                    os.remove(filename)
-        else:
-            if first_response:
-                await interaction.response.send_message(script)
-                first_response = False
-            else:
-                await interaction.followup.send(script)
-
-@bot.tree.command(name="bancouse", description='Scripts usados no Banco do USE')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def BancoUse(interaction: discord.Interaction):
-    Type1 = 'BancoUse'
-    scripts = await get_scripts_type(Type1)
-
-    first_response = True
-    for script, filename in scripts:
-        if filename:
-            if os.path.exists(filename):
-                try:
-                    if first_response:
-                        await interaction.response.send_message(file=discord.File(filename))
-                        first_response = False
-                    else:
-                        await interaction.followup.send(file=discord.File(filename))
-                finally:
-                    os.remove(filename)
-        else:
-            if first_response:
-                await interaction.response.send_message(script)
-                first_response = False
-            else:
-                await interaction.followup.send(script)
-
-@bot.tree.command(name="snapprint", description='Scripts usados no SnapPrint')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def SnapPrint(interaction: discord.Interaction):
-    Type1 = 'SnapPrint'
-    scripts = await get_scripts_type(Type1)
-
-    first_response = True
-    for script, filename in scripts:
-        if filename:
-            if os.path.exists(filename):
-                try:
-                    if first_response:
-                        await interaction.response.send_message(file=discord.File(filename))
-                        first_response = False
-                    else:
-                        await interaction.followup.send(file=discord.File(filename))
-                finally:
-                    os.remove(filename)
-        else:
-            if first_response:
-                await interaction.response.send_message(script)
-                first_response = False
-            else:
-                await interaction.followup.send(script)
-
-@bot.tree.command(name="tema", description='Temas do SnapPDV')
-@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
-async def Tema(interaction: discord.Interaction):
-    Type1 = 'Tema'
-    scripts = await get_scripts_type(Type1)
-
-    first_response = True
-    for script, filename in scripts:
-        if filename:
-            if os.path.exists(filename):
-                try:
-                    if first_response:
-                        await interaction.response.send_message(file=discord.File(filename))
-                        first_response = False
-                    else:
-                        await interaction.followup.send(file=discord.File(filename))
-                finally:
-                    os.remove(filename)
-        else:
-            if first_response:
-                await interaction.response.send_message(script)
-                first_response = False
-            else:
-                await interaction.followup.send(script)
-
 @bot.tree.command(name="lojasbottero", description="mostra uma planilha com as lojas botteros separando por franqueadas ou não")
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def LojasBottero(interaction: discord.Interaction):
@@ -437,6 +265,16 @@ async def Qualita(interaction: discord.Interaction):
                     await interaction.response.send_message(file=discord.File(fp=io.BytesIO(data), filename="image.png"))
                 else:
                     await interaction.response.send_message(f"Falha ao baixar a imagem: {link}")
+
+@bot.tree.command(name="scripts", description='Scripts gerais')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+async def get_scripts(interaction: discord.Interaction):
+    await show_scripts_buttons(interaction)
+
+@bot.tree.command(name="acessosinternos", description='Acessos Internos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+async def AcessosInternos(interaction: discord.Interaction):
+    await show_type1_buttons(interaction)
 
 @bot.event
 async def on_ready():
