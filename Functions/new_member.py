@@ -4,7 +4,7 @@ import io
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 async def new_member(member):
-    channel = discord.utils.get(member.guild.text_channels, name='hora_do_café')
+    channel = discord.utils.get(member.guild.text_channels, name='ℍ𝕠𝕣𝕒𝔻𝕠ℂ𝕒𝕗𝕖☕')
     if channel:
         # Download the user's avatar
         async with aiohttp.ClientSession() as session:
