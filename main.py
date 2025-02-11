@@ -23,6 +23,7 @@ from Functions.Incidentes import show_incidentes_buttons
 from Database.database import supabase
 from Functions.generate_cpf import generate_cpf
 from Functions.AcessosInternos import show_type1_buttons
+from Functions.AcessosRestritos import show_type1_buttonsRestrito
 
 load_dotenv()
 
@@ -281,6 +282,11 @@ async def get_scripts(interaction: discord.Interaction):
 @canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
 async def AcessosInternos(interaction: discord.Interaction):
     await show_type1_buttons(interaction)
+
+@bot.tree.command(name="acessosrestritos", description='Acessos Restritos')
+@canal_especifico('𝕮𝖔𝖒𝖆𝖓𝖉𝖔𝖘🤖')
+async def AcessosRestritos(interaction: discord.Interaction):
+    await show_type1_buttonsRestrito(interaction)
 
 @bot.event
 async def on_ready():
