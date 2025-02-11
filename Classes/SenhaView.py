@@ -18,4 +18,4 @@ class SenhaView(discord.ui.View):
         if interaction.user != self.original_user:
             await interaction.response.send_message("Você não tem permissão para interagir com este botão.", ephemeral=True)
             return
-        await interaction.channel.purge(limit=None, check=lambda m: m.author == interaction.client.user)
+        await interaction.message.delete()
