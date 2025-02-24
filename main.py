@@ -24,6 +24,7 @@ from Database.database import supabase
 from Functions.generate_cpf import generate_cpf
 from Functions.AcessosInternos import show_type1_buttons
 from Functions.AcessosRestritos import show_type1_buttonsRestrito
+from Functions.get_usersId import get_UsersId
 
 load_dotenv()
 
@@ -150,6 +151,7 @@ async def PlantoesMes(interaction: discord.Interaction):
         
         # Converter as datas para objetos datetime e calcular a diferença em relação ao dia atual
         hoje = datetime.today()
+        primero_dia_mes = datetime(hoje.year, hoje.month, 1)
         ultimo_dia_mes = datetime(hoje.year, hoje.month, 1) + timedelta(days=32)
         ultimo_dia_mes = ultimo_dia_mes.replace(day=1) - timedelta(days=1)
         
@@ -160,7 +162,7 @@ async def PlantoesMes(interaction: discord.Interaction):
                 "Responsavel": item['Responsavel']
             }
             for item in response.data
-            if datetime.strptime(item['DataFinal'], '%Y-%m-%d') <= ultimo_dia_mes
+            if datetime.strptime(item['DataFinal'], '%Y-%m-%d') <= ultimo_dia_mes and datetime.strptime(item['DataFinal'], '%Y-%m-%d') >= primero_dia_mes
         ]
         
         dados_formatados.sort(key=lambda x: x['DataInicio'])
@@ -290,6 +292,15 @@ async def AcessosRestritos(interaction: discord.Interaction):
 
 @bot.event
 async def on_ready():
+    guild = bot.get_guild(898116893348593418)
+    if guild is None:
+        print("Erro: Não foi possível encontrar o servidor com o ID fornecido.")
+        return
+
+    user_list = await get_UsersId(guild)
+    print("Lista de usuários no servidor:")
+    for user in user_list:
+        print(user)
     clear_channel.start()
     print(f'Bot conectado como {bot.user}')
     try:
