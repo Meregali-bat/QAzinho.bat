@@ -1,0 +1,20 @@
+Bot discord
+ID
+1313595205223579690
+
+Token
+MTMxMzU5NTIwNTIyMzU3OTY5MA.GoAEIB.x6HCxwXJg9CjC58MI-ui6hsVkbPc58IfuRmmAI
+
+URL
+https://discord.com/oauth2/authorize?client_id=1313595205223579690&permissions=8&integration_type=0&scope=bot
+
+Senha do banco
+5c987d428240628890185dea1f31153b
+
+
+
+
+Bot Teste
+
+Token
+MTMxNTc0NDQwODcyMDc2OTA1NA.GSXoym.fIEgo77HbdXe9JS4TQ0-PsjnzpPYD98p0F6lck
