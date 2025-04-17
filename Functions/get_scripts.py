@@ -9,6 +9,7 @@ type_to_style = {
     "BancoUse": ButtonStyle.green,
     "Tema": ButtonStyle.blurple,
     "SnapPrint": ButtonStyle.red,
+    "CV": ButtonStyle.red,
     # Adicione mais mapeamentos conforme necessário
 }
 
@@ -17,6 +18,7 @@ type_to_emoji = {
     "BancoUse": "🪑",
     "Tema": "🖼️",
     "SnapPrint": "🖨️",
+    "CV": "🛍️",  
     # Adicione mais mapeamentos conforme necessário
 }
 
