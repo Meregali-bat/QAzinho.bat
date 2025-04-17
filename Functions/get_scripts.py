@@ -33,6 +33,7 @@ type2_to_style = {
     "TemaMercado": ButtonStyle.blurple,
     "Consulta": ButtonStyle.blurple,
     "Correcoes": ButtonStyle.green,
+    "CV": ButtonStyle.red,
     # Adicione mais mapeamentos conforme necessário
 }
 
@@ -47,6 +48,7 @@ type2_to_emoji = {
     "TemaMercado": "🛒",
     "Consulta": "🔎",
     "Correcoes": "📝",
+    "CV": "🛍️",  
     # Adicione mais mapeamentos conforme necessário
 }
 
