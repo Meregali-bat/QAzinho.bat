@@ -27,9 +27,6 @@ from Functions.AcessosRestritos import show_type1_buttonsRestrito
 
 load_dotenv()
 
-repo = git.Repo(search_parent_directories=True)
-current_branch = repo.active_branch.name
-
 # Create a Discord client instance and set the command prefix
 intents = discord.Intents.default()
 intents.message_content = True 
@@ -299,7 +296,4 @@ async def on_ready():
     except Exception as e:
         print(f'Erro ao sincronizar comandos: {e}')
 
-if current_branch == 'Master':
-    TOKEN = bot.run(os.getenv('TOKEN'))
-else:
-    TOKEN = bot.run(os.getenv('TOKEN_TESTE'))
+TOKEN = bot.run(os.getenv('TOKEN'))
