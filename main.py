@@ -300,15 +300,16 @@ async def on_ready():
     except Exception as e:
         print(f'Erro ao sincronizar comandos: {e}')
 
-TOKEN = bot.run(os.getenv('TOKEN'))
+
+def start_bot():
+    bot.run(os.getenv('TOKEN'))
 
 @app.route('/')
 def home():
     return "Bot está rodando!"
 
-def run():
+if __name__ == "__main__":
+    Thread(target=start_bot).start()
     port = int(os.getenv("PORT", 3000))
     print(f"[INFO] Iniciando Flask na porta {port}")
     app.run(host="0.0.0.0", port=port)
-
-Thread(target=run).start()
