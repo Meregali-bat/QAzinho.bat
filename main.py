@@ -307,7 +307,7 @@ def home():
     return "Bot está rodando!"
 
 def run():
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.getenv("PORT", 3000))
     app.run(host="0.0.0.0", port=port)
 
 Thread(target=run).start()
