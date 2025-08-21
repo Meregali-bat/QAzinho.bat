@@ -5,4 +5,4 @@ babel
 aiohttp
 Pillow
 supabase
-babel
+flask
