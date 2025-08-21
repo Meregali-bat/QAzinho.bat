@@ -34,7 +34,7 @@ type2_to_style = {
 }
 
 type2_to_emoji = {
-    "Snapcontrol": "™️",
+    "Snapcontrol": "🔥",
     "BancoUse": "🪑",
     "Mentor": "🧠",
     "Zap4You": "📨",
