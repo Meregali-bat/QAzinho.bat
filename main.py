@@ -12,6 +12,10 @@ import base64
 import json
 import aiohttp
 import io
+from flask import Flask
+from threading import Thread
+
+app = Flask(__name__)
 
 from Functions.command_error import command_error
 from Functions.new_member import new_member
@@ -297,3 +301,13 @@ async def on_ready():
         print(f'Erro ao sincronizar comandos: {e}')
 
 TOKEN = bot.run(os.getenv('TOKEN'))
+
+@app.route('/')
+def home():
+    return "Bot está rodando!"
+
+def run():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
+Thread(target=run).start()
