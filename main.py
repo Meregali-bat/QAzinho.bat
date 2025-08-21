@@ -308,6 +308,7 @@ def home():
 
 def run():
     port = int(os.getenv("PORT", 3000))
+    print(f"[INFO] Iniciando Flask na porta {port}")
     app.run(host="0.0.0.0", port=port)
 
 Thread(target=run).start()
