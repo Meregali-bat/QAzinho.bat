@@ -4,11 +4,20 @@ import io
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 async def new_member(member):
+    """
+    Creates and sends a welcome message with an image when a new member joins.
+    Improvements:
+    - Uses fallback fonts when arial.ttf is not available
+    - Handles cases where user has no custom avatar (uses default avatar)
+    - Creates fallback background if image file is missing
+    - Simplified welcome message text
+    """
     channel = discord.utils.get(member.guild.text_channels, name='ℍ𝕠𝕣𝕒𝔻𝕠ℂ𝕒𝕗𝕖☕')
     if channel:
-        # Download the user's avatar
+        # Download the user's avatar (use default avatar if none exists)
+        avatar_url = member.avatar.url if member.avatar else member.default_avatar.url
         async with aiohttp.ClientSession() as session:
-            async with session.get(str(member.avatar.url)) as response:
+            async with session.get(str(avatar_url)) as response:
                 avatar_bytes = await response.read()
 
         # Open the avatar image
@@ -36,7 +45,11 @@ async def new_member(member):
         border_avatar.paste(avatar, (border_size, border_size), avatar)
 
         # Open the background image
-        bg_image = Image.open('./Assets/background2.png')
+        try:
+            bg_image = Image.open('./Assets/background2.png')
+        except (FileNotFoundError, OSError):
+            # Create a simple background if the image is missing
+            bg_image = Image.new('RGB', (800, 400), color=(114, 137, 218))  # Discord-like blue color
 
         # Calculate the position to center the avatar on the background
         bg_width, bg_height = bg_image.size
@@ -51,8 +64,18 @@ async def new_member(member):
 
         # Add text to the image
         draw = ImageDraw.Draw(bg_image)
-        font = ImageFont.truetype("arial.ttf", 20)
-        text = f'Bem-vindo, {member.name}, novo suporte do grupo W2A!'
+        try:
+            # Try to load arial font, fall back to default if not available
+            font = ImageFont.truetype("arial.ttf", 20)
+        except (OSError, IOError):
+            try:
+                # Try other common font paths
+                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+            except (OSError, IOError):
+                # Use default font as last resort
+                font = ImageFont.load_default()
+        
+        text = f'Bem-vindo, {member.name}! 🎉'
         text_bbox = draw.textbbox((0, 0), text, font=font)
         text_width = text_bbox[2] - text_bbox[0]
         text_position = (
